@@ -1,5 +1,5 @@
 export const DEFAULT_PROMPT =
-  "A realistic studio photograph of the person in image 1 wearing the exact saree shown in image 2. LOCK AND PRESERVE THE ENTIRE HEAD, FACE, EYES, NOSE, LIPS, HAIR, AND NECK FROM IMAGE 1 EXACTLY AS THEY ARE WITH 100% IDENTITY FIDELITY. Replace only the clothing below the neck with the saree from image 2, accurately transferring the saree's fabric pattern, color palette, zari border, and pallu design with natural draping, realistic folds, and matching studio lighting.";
+  "A realistic studio photograph of the person in Image 1 wearing the exact saree from Image 2. LOCK AND PRESERVE Image 1's person identity, face, facial expression, skin tone, hairstyle, head angle, body posture, hands, background, and studio lighting 100% identically without any changes. REPLACE ONLY the person's current clothing/dress in Image 1 with the Indian saree from Image 2 along with a color-matched blouse. Drape the saree from Image 2 in the authentic traditional Indian style with neat waist pleats and a crisp pallu over the shoulder, accurately transferring the fabric texture, zari border, motif patterns, and color palette from Image 2. Do not alter anything else in Image 1.";
 
 export interface ModelOption {
   id: string;

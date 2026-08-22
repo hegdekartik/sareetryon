@@ -68,7 +68,7 @@ export async function POST(req: NextRequest) {
       const input: Record<string, any> = {
         human_img: personImage,
         garm_img: sareeImage,
-        garment_des: "Indian saree attire with detailed pallu and border",
+        garment_des: "Authentic traditional Indian saree attire with color-matched blouse, detailed zari border, waist pleats, and pallu design",
         category: "dresses",
       };
 
