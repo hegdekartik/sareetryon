@@ -16,7 +16,8 @@ export default function Home() {
   const [personAspectRatio, setPersonAspectRatio] = useState<string | null>(null);
   const [sareeImage, setSareeImage] = useState<string | null>(null);
 
-  // Generation parameters
+  // Model & Generation parameters (cuuupid/idm-vton is default for lowest cost)
+  const [selectedModel, setSelectedModel] = useState<string>("cuuupid/idm-vton");
   const [prompt, setPrompt] = useState<string>(DEFAULT_PROMPT);
   const [aspectRatio, setAspectRatio] = useState<string>("match_input_image");
   const [resolution, setResolution] = useState<string>("1K");
@@ -88,6 +89,7 @@ export default function Home() {
           personImage,
           sareeImage,
           prompt,
+          model: selectedModel,
           aspect_ratio: aspectRatio,
           personAspectRatio,
           resolution,
@@ -98,21 +100,26 @@ export default function Home() {
       const data = await response.json();
 
       if (!response.ok) {
-        throw new Error(data.error || "Failed to generate try-on with Google Nano Banana 2.");
+        throw new Error(data.error || "Failed to generate virtual saree try-on.");
       }
 
       if (data.resultImage) {
         setResultImage(data.resultImage);
       } else {
-        throw new Error("No image output received from Google Nano Banana 2.");
+        throw new Error("No image output received from AI provider.");
       }
     } catch (err: any) {
-      console.error("Nano Banana Try-On Error:", err);
+      console.error("Virtual Try-On Error:", err);
       setError(err?.message || "Generation error. Please check your Replicate API key.");
     } finally {
       setIsLoading(false);
     }
   };
+
+  const providerDisplayName =
+    selectedModel === "google/nano-banana-2"
+      ? "Google Nano Banana 2"
+      : "IDM-VTON (~$0.003 / img)";
 
   return (
     <div className="min-h-dvh flex flex-col bg-slate-50/50 text-slate-900 selection:bg-amber-400 selection:text-slate-900">
@@ -201,13 +208,15 @@ export default function Home() {
             resultImage={resultImage}
             prompt={prompt}
             onPromptChange={setPrompt}
+            selectedModel={selectedModel}
+            onModelChange={setSelectedModel}
             aspectRatio={aspectRatio}
             onAspectRatioChange={setAspectRatio}
             resolution={resolution}
             onResolutionChange={setResolution}
             isLoading={isLoading}
             onGenerateTryOn={handleGenerateTryOn}
-            providerName="Google Nano Banana 2"
+            providerName={providerDisplayName}
             error={error}
           />
         </div>
@@ -216,7 +225,7 @@ export default function Home() {
       {/* Footer */}
       <footer className="w-full bg-white border-t border-slate-200 py-4 px-6 text-center text-xs text-slate-500 mt-auto">
         <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-2 font-medium">
-          <p>© {new Date().getFullYear()} SareeStudio AI — Powered by Google Nano Banana 2 on Replicate</p>
+          <p>© {new Date().getFullYear()} SareeStudio AI — Powered by IDM-VTON & Replicate</p>
           <div className="flex items-center gap-4">
             <button
               onClick={() => setIsApiGuideOpen(true)}

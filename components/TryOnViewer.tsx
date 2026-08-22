@@ -13,9 +13,10 @@ import {
   Eye,
   MessageSquareText,
   Settings2,
-  Image as ImageIcon
+  Image as ImageIcon,
+  Cpu
 } from "lucide-react";
-import { ASPECT_RATIOS, RESOLUTION_OPTIONS } from "@/lib/presets";
+import { ASPECT_RATIOS, RESOLUTION_OPTIONS, MODEL_OPTIONS } from "@/lib/presets";
 
 interface TryOnViewerProps {
   personImage: string | null;
@@ -23,6 +24,8 @@ interface TryOnViewerProps {
   resultImage: string | null;
   prompt: string;
   onPromptChange: (prompt: string) => void;
+  selectedModel: string;
+  onModelChange: (model: string) => void;
   aspectRatio: string;
   onAspectRatioChange: (aspectRatio: string) => void;
   resolution: string;
@@ -39,20 +42,22 @@ export function TryOnViewer({
   resultImage,
   prompt,
   onPromptChange,
+  selectedModel,
+  onModelChange,
   aspectRatio,
   onAspectRatioChange,
   resolution,
   onResolutionChange,
   isLoading,
   onGenerateTryOn,
-  providerName = "Google Nano Banana 2",
+  providerName = "IDM-VTON",
   error,
 }: TryOnViewerProps) {
   const [sliderPosition, setSliderPosition] = useState<number>(50);
   const [isDragging, setIsDragging] = useState<boolean>(false);
   const [viewMode, setViewMode] = useState<"slider" | "split" | "result">("result");
   const [isFullscreen, setIsFullscreen] = useState<boolean>(false);
-  const [showAdvancedSettings, setShowAdvancedSettings] = useState<boolean>(false);
+  const [showAdvancedSettings, setShowAdvancedSettings] = useState<boolean>(true);
   const containerRef = useRef<HTMLDivElement>(null);
 
   const isInputsReady = Boolean(personImage && sareeImage);
@@ -107,7 +112,7 @@ export function TryOnViewer({
     if (!resultImage) return;
     const link = document.createElement("a");
     link.href = resultImage;
-    link.download = `saree-tryon-nanobanana-${Date.now()}.jpg`;
+    link.download = `saree-tryon-${Date.now()}.jpg`;
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
@@ -122,14 +127,14 @@ export function TryOnViewer({
             <h2 className="font-bold text-slate-900 text-lg flex items-center gap-2">
               Virtual Try-On Canvas
             </h2>
-            <span className="px-2.5 py-0.5 text-[11px] font-semibold bg-amber-50 text-amber-800 border border-amber-200 rounded-full">
+            <span className="px-2.5 py-0.5 text-[11px] font-semibold bg-emerald-50 text-emerald-800 border border-emerald-200 rounded-full">
               {providerName}
             </span>
           </div>
           <p className="text-xs text-slate-500 font-medium mt-0.5">
             {resultImage
-              ? "Generation complete! View output or adjust prompt and try again."
-              : "Upload both reference images to generate saree try-on."}
+              ? "Generation complete! View output or select another model below."
+              : "Upload both reference images to generate virtual saree fit."}
           </p>
         </div>
 
@@ -181,65 +186,91 @@ export function TryOnViewer({
         </div>
       )}
 
-      {/* Prompt Configuration Box */}
-      <div className="bg-slate-50/80 rounded-xl border border-slate-200 p-3.5 flex flex-col gap-2.5">
+      {/* Settings & Model Selector Box */}
+      <div className="bg-slate-50/80 rounded-xl border border-slate-200 p-3.5 flex flex-col gap-3">
+        {/* Model Selection Header */}
         <div className="flex items-center justify-between">
           <label className="text-xs font-bold text-slate-800 flex items-center gap-1.5">
-            <MessageSquareText className="w-3.5 h-3.5 text-amber-600" />
-            <span>Generation Prompt Instruction</span>
+            <Cpu className="w-4 h-4 text-emerald-600" />
+            <span>AI Try-On Model</span>
           </label>
           <button
             onClick={() => setShowAdvancedSettings(!showAdvancedSettings)}
             className="text-xs font-semibold text-slate-600 hover:text-slate-900 flex items-center gap-1 cursor-pointer"
           >
             <Settings2 className="w-3.5 h-3.5" />
-            <span>{showAdvancedSettings ? "Hide Settings" : "Options"}</span>
+            <span>{showAdvancedSettings ? "Hide Options" : "More Options"}</span>
           </button>
         </div>
 
-        <textarea
-          value={prompt}
-          onChange={(e) => onPromptChange(e.target.value)}
-          placeholder="Enter custom prompt instructions for Nano Banana..."
-          rows={2}
-          className="w-full text-xs bg-white border border-slate-300 rounded-lg p-2.5 font-medium text-slate-800 focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 transition-all resize-none"
-        />
+        {/* Model Dropdown Selector */}
+        <div className="grid grid-cols-1 gap-2">
+          <select
+            value={selectedModel}
+            onChange={(e) => onModelChange(e.target.value)}
+            className="w-full text-xs font-bold bg-white border border-slate-300 rounded-xl p-2.5 text-slate-900 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-600 cursor-pointer shadow-2xs"
+          >
+            {MODEL_OPTIONS.map((opt) => (
+              <option key={opt.id} value={opt.value}>
+                {opt.label} — {opt.costLabel}
+              </option>
+            ))}
+          </select>
+        </div>
 
-        {/* Collapsible Advanced Settings (Aspect Ratio & Resolution) */}
+        {/* Prompt & Advanced Settings */}
         {showAdvancedSettings && (
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2 border-t border-slate-200">
-            <div>
-              <label className="text-[11px] font-bold text-slate-700 block mb-1">
-                Aspect Ratio
-              </label>
-              <select
-                value={aspectRatio}
-                onChange={(e) => onAspectRatioChange(e.target.value)}
-                className="w-full text-xs bg-white border border-slate-300 rounded-lg p-2 font-semibold text-slate-800 focus:outline-none focus:border-amber-500 cursor-pointer"
-              >
-                {ASPECT_RATIOS.map((opt) => (
-                  <option key={opt.id} value={opt.value}>
-                    {opt.label}
-                  </option>
-                ))}
-              </select>
-            </div>
+          <div className="flex flex-col gap-3 pt-2 border-t border-slate-200">
+            {selectedModel === "google/nano-banana-2" && (
+              <div>
+                <label className="text-xs font-bold text-slate-800 flex items-center gap-1.5 mb-1.5">
+                  <MessageSquareText className="w-3.5 h-3.5 text-amber-600" />
+                  <span>Prompt Instruction (Gemini Multimodal)</span>
+                </label>
+                <textarea
+                  value={prompt}
+                  onChange={(e) => onPromptChange(e.target.value)}
+                  placeholder="Enter prompt instructions for Nano Banana..."
+                  rows={2}
+                  className="w-full text-xs bg-white border border-slate-300 rounded-lg p-2.5 font-medium text-slate-800 focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 transition-all resize-none"
+                />
+              </div>
+            )}
 
-            <div>
-              <label className="text-[11px] font-bold text-slate-700 block mb-1">
-                Resolution
-              </label>
-              <select
-                value={resolution}
-                onChange={(e) => onResolutionChange(e.target.value)}
-                className="w-full text-xs bg-white border border-slate-300 rounded-lg p-2 font-semibold text-slate-800 focus:outline-none focus:border-amber-500 cursor-pointer"
-              >
-                {RESOLUTION_OPTIONS.map((opt) => (
-                  <option key={opt.id} value={opt.value}>
-                    {opt.label}
-                  </option>
-                ))}
-              </select>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div>
+                <label className="text-[11px] font-bold text-slate-700 block mb-1">
+                  Aspect Ratio
+                </label>
+                <select
+                  value={aspectRatio}
+                  onChange={(e) => onAspectRatioChange(e.target.value)}
+                  className="w-full text-xs bg-white border border-slate-300 rounded-lg p-2 font-semibold text-slate-800 focus:outline-none focus:border-slate-500 cursor-pointer"
+                >
+                  {ASPECT_RATIOS.map((opt) => (
+                    <option key={opt.id} value={opt.value}>
+                      {opt.label}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div>
+                <label className="text-[11px] font-bold text-slate-700 block mb-1">
+                  Resolution Output
+                </label>
+                <select
+                  value={resolution}
+                  onChange={(e) => onResolutionChange(e.target.value)}
+                  className="w-full text-xs bg-white border border-slate-300 rounded-lg p-2 font-semibold text-slate-800 focus:outline-none focus:border-slate-500 cursor-pointer"
+                >
+                  {RESOLUTION_OPTIONS.map((opt) => (
+                    <option key={opt.id} value={opt.value}>
+                      {opt.label}
+                    </option>
+                  ))}
+                </select>
+              </div>
             </div>
           </div>
         )}
@@ -251,21 +282,21 @@ export function TryOnViewer({
           /* Animated Loading State */
           <div className="flex flex-col items-center justify-center p-8 gap-4 text-center z-20">
             <div className="relative w-16 h-16">
-              <div className="absolute inset-0 rounded-full border-4 border-amber-500/20 border-t-amber-500 animate-spin"></div>
-              <div className="absolute inset-2 rounded-full border-4 border-purple-500/20 border-b-purple-500 animate-spin flex items-center justify-center">
-                <Sparkles className="w-5 h-5 text-amber-400 animate-pulse" />
+              <div className="absolute inset-0 rounded-full border-4 border-emerald-500/20 border-t-emerald-500 animate-spin"></div>
+              <div className="absolute inset-2 rounded-full border-4 border-amber-500/20 border-b-amber-500 animate-spin flex items-center justify-center">
+                <Sparkles className="w-5 h-5 text-emerald-400 animate-pulse" />
               </div>
             </div>
             <div>
               <p className="font-bold text-white text-base">
-                Google Nano Banana 2 Processing...
+                Running Virtual Try-On...
               </p>
               <p className="text-xs text-slate-400 mt-1 max-w-xs font-medium animate-pulse">
-                Merging saree texture, border details, and model pose with AI consistency
+                Warping saree pattern, border embellishments & pallu details onto persona
               </p>
             </div>
             <div className="w-48 bg-slate-800 h-1.5 rounded-full overflow-hidden">
-              <div className="bg-gradient-to-r from-amber-500 via-purple-500 to-emerald-400 h-full w-full animate-pulse"></div>
+              <div className="bg-gradient-to-r from-emerald-500 via-amber-400 to-purple-500 h-full w-full animate-pulse"></div>
             </div>
           </div>
         ) : resultImage ? (
@@ -292,14 +323,14 @@ export function TryOnViewer({
                   Saree Style
                 </span>
               </div>
-              <div className="relative h-full rounded-lg overflow-hidden border border-amber-500/40 bg-slate-900 flex items-center justify-center">
+              <div className="relative h-full rounded-lg overflow-hidden border border-emerald-500/40 bg-slate-900 flex items-center justify-center">
                 <img
                   src={resultImage}
-                  alt="Nano Banana Result"
+                  alt="AI Try-On Result"
                   className="w-full h-full object-cover"
                 />
-                <span className="absolute bottom-2 right-2 px-2 py-0.5 bg-amber-500 text-[10px] text-slate-950 font-bold rounded">
-                  Nano Banana Result
+                <span className="absolute bottom-2 right-2 px-2 py-0.5 bg-emerald-500 text-[10px] text-slate-950 font-bold rounded">
+                  AI Output
                 </span>
               </div>
             </div>
@@ -319,11 +350,11 @@ export function TryOnViewer({
             >
               <img
                 src={resultImage}
-                alt="Nano Banana Try-On Output"
+                alt="AI Try-On Output"
                 className="absolute inset-0 w-full h-full object-contain"
               />
-              <span className="absolute top-3 right-3 px-2.5 py-1 bg-amber-500 text-[11px] font-bold text-slate-950 rounded-md shadow-sm z-10">
-                Nano Banana Result
+              <span className="absolute top-3 right-3 px-2.5 py-1 bg-emerald-500 text-[11px] font-bold text-slate-950 rounded-md shadow-sm z-10">
+                AI Saree Fit
               </span>
 
               <div
@@ -358,10 +389,10 @@ export function TryOnViewer({
             <div className="relative w-full h-full bg-slate-950 flex items-center justify-center p-2">
               <img
                 src={resultImage}
-                alt="Nano Banana Try-On Output"
+                alt="AI Try-On Output"
                 className="w-full h-full object-contain max-h-[500px] rounded-lg"
               />
-              <span className="absolute top-3 left-3 px-2.5 py-1 bg-amber-500/90 text-slate-950 text-xs font-bold rounded-md shadow-xs flex items-center gap-1">
+              <span className="absolute top-3 left-3 px-2.5 py-1 bg-emerald-500/90 text-slate-950 text-xs font-bold rounded-md shadow-xs flex items-center gap-1">
                 <CheckCircle2 className="w-3.5 h-3.5" />
                 <span>Generated Output</span>
               </span>
@@ -374,7 +405,7 @@ export function TryOnViewer({
               <ImageIcon className="w-7 h-7" />
             </div>
             <h3 className="text-base font-bold text-white">
-              Ready for Saree Generation
+              Ready for Virtual Try-On
             </h3>
             <p className="text-xs text-slate-400 max-w-sm">
               Upload both the Person Reference Image and Saree Style Image on the left, then click Generate.
@@ -396,17 +427,17 @@ export function TryOnViewer({
         >
           {isLoading ? (
             <>
-              <RefreshCw className="w-4 h-4 animate-spin text-amber-400" />
-              <span>Generating with Nano Banana 2...</span>
+              <RefreshCw className="w-4 h-4 animate-spin text-emerald-400" />
+              <span>Generating Try-On...</span>
             </>
           ) : (
             <>
-              <Sparkles className="w-4 h-4 text-amber-400" />
+              <Sparkles className="w-4 h-4 text-emerald-400" />
               <span>
                 {!isInputsReady
                   ? "Upload Both Images to Generate"
                   : resultImage
-                  ? "Re-Generate Saree Try-On"
+                  ? "Re-Generate Saree Fit"
                   : "Generate Virtual Try-On"}
               </span>
             </>
@@ -445,7 +476,7 @@ export function TryOnViewer({
           </button>
           <img
             src={resultImage}
-            alt="Google Nano Banana 2 Output HD"
+            alt="AI Saree Output HD"
             className="max-w-full max-h-[88vh] object-contain rounded-xl bg-slate-900 shadow-2xl p-2"
           />
         </div>

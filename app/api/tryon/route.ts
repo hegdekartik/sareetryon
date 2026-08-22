@@ -9,6 +9,7 @@ export async function POST(req: NextRequest) {
       personImage,
       sareeImage,
       prompt,
+      model = "cuuupid/idm-vton",
       aspect_ratio = "match_input_image",
       personAspectRatio,
       resolution = "2K",
@@ -41,24 +42,41 @@ export async function POST(req: NextRequest) {
     }
 
     const replicate = new Replicate({ auth: token });
-
     const inputPrompt = (prompt && prompt.trim()) ? prompt.trim() : DEFAULT_PROMPT;
 
-    // Determine target aspect ratio. If user selected match_input_image,
-    // use the measured aspect ratio of the person image if available, else match_input_image.
-    let targetAspectRatio = aspect_ratio;
-    if (aspect_ratio === "match_input_image" && personAspectRatio) {
-      targetAspectRatio = personAspectRatio;
+    let output: any;
+    let providerName = "IDM-VTON (cuuupid/idm-vton)";
+
+    if (model === "google/nano-banana-2") {
+      providerName = "Google Nano Banana 2 (Replicate)";
+      let targetAspectRatio = aspect_ratio;
+      if (aspect_ratio === "match_input_image" && personAspectRatio) {
+        targetAspectRatio = personAspectRatio;
+      }
+
+      const input: Record<string, any> = {
+        prompt: inputPrompt,
+        image_input: [personImage, sareeImage],
+        aspect_ratio: targetAspectRatio || "match_input_image",
+        resolution: resolution || "2K",
+      };
+
+      output = await replicate.run("google/nano-banana-2", { input });
+    } else {
+      // Default: cuuupid/idm-vton (Dedicated VTON - ~$0.003/img)
+      providerName = "IDM-VTON (cuuupid/idm-vton)";
+      const input: Record<string, any> = {
+        human_img: personImage,
+        garm_img: sareeImage,
+        garment_des: "Indian saree attire with detailed pallu and border",
+        category: "dresses",
+      };
+
+      output = await replicate.run(
+        "cuuupid/idm-vton:c871d2e9bc709f538b7d413346d0a794b15ff3fa5f8c85775f0a0d9e830d9703",
+        { input }
+      );
     }
-
-    const input: Record<string, any> = {
-      prompt: inputPrompt,
-      image_input: [personImage, sareeImage],
-      aspect_ratio: targetAspectRatio || "match_input_image",
-      resolution: resolution || "2K",
-    };
-
-    const output: any = await replicate.run("google/nano-banana-2", { input });
 
     let resultUrl: string | null = null;
 
@@ -82,12 +100,12 @@ export async function POST(req: NextRequest) {
     }
 
     if (!resultUrl) {
-      throw new Error("No image output returned from Google Nano Banana 2.");
+      throw new Error(`No image output returned from ${providerName}.`);
     }
 
     return NextResponse.json({
       resultImage: resultUrl,
-      provider: "Google Nano Banana 2 (Replicate)",
+      provider: providerName,
     });
   } catch (error: any) {
     console.error("Virtual Try-On route error:", error);

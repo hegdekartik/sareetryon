@@ -1,6 +1,31 @@
 export const DEFAULT_PROMPT =
   "A realistic studio photograph of the person in image 1 wearing the exact saree shown in image 2. LOCK AND PRESERVE THE ENTIRE HEAD, FACE, EYES, NOSE, LIPS, HAIR, AND NECK FROM IMAGE 1 EXACTLY AS THEY ARE WITH 100% IDENTITY FIDELITY. Replace only the clothing below the neck with the saree from image 2, accurately transferring the saree's fabric pattern, color palette, zari border, and pallu design with natural draping, realistic folds, and matching studio lighting.";
 
+export interface ModelOption {
+  id: string;
+  label: string;
+  value: string;
+  costLabel: string;
+  description: string;
+}
+
+export const MODEL_OPTIONS: ModelOption[] = [
+  {
+    id: "idm-vton",
+    label: "IDM-VTON (Dedicated Saree Model)",
+    value: "cuuupid/idm-vton",
+    costLabel: "~$0.003 / image (Lowest Cost)",
+    description: "Dedicated virtual try-on model for preserving saree texture, pallu, and border weaves",
+  },
+  {
+    id: "nano-banana-2",
+    label: "Google Nano Banana 2",
+    value: "google/nano-banana-2",
+    costLabel: "~$0.067 / image (Premium)",
+    description: "Multimodal Gemini image generation engine",
+  },
+];
+
 export interface AspectRatioOption {
   id: string;
   label: string;
