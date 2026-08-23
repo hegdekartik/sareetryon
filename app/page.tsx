@@ -119,6 +119,8 @@ export default function Home() {
   const providerDisplayName =
     selectedModel === "google/nano-banana-2"
       ? "Google Nano Banana 2"
+      : selectedModel === "google/imagen-3-fast"
+      ? "Google Imagen 3 Fast"
       : "FLUX SCHNELL (~$0.003 / img)";
 
   return (

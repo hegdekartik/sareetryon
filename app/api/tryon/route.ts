@@ -62,6 +62,14 @@ export async function POST(req: NextRequest) {
       };
 
       output = await replicate.run("google/nano-banana-2", { input });
+    } else if (model === "google/imagen-3-fast") {
+      providerName = "Google Imagen 3 Fast (google/imagen-3-fast)";
+      const input: Record<string, any> = {
+        prompt: inputPrompt,
+        aspect_ratio: aspect_ratio || "3:4",
+      };
+
+      output = await replicate.run("google/imagen-3-fast", { input });
     } else {
       // Default: black-forest-labs/flux-schnell
       providerName = "FLUX SCHNELL (black-forest-labs/flux-schnell)";
@@ -88,12 +96,21 @@ export async function POST(req: NextRequest) {
       if (typeof first === "string") {
         resultUrl = first;
       } else if (first && typeof first.url === "function") {
-        resultUrl = String(first.url());
+        const generatedUrl = first.url();
+        resultUrl = typeof generatedUrl === "object" ? generatedUrl.href : String(generatedUrl);
       } else if (first && typeof first === "object" && "url" in first) {
         resultUrl = String(first.url);
+      } else {
+        resultUrl = String(first); // Fallback for streams with overloaded toString
       }
     } else if (output && typeof output.toString === "function") {
       resultUrl = output.toString();
+    }
+    
+    // Explicit final check if Replicate SDK returned FileOutput directly without an array
+    if (!resultUrl && output && typeof output.url === "function") {
+      const singleUrl = output.url();
+      resultUrl = typeof singleUrl === "object" ? singleUrl.href : String(singleUrl);
     }
 
     if (!resultUrl) {

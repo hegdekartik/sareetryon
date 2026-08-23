@@ -18,6 +18,13 @@ export const MODEL_OPTIONS: ModelOption[] = [
     description: "Fast high-quality text-to-image model",
   },
   {
+    id: "imagen-3-fast",
+    label: "Google Imagen 3 Fast",
+    value: "google/imagen-3-fast",
+    costLabel: "~$0.03 / image (Fast)",
+    description: "Fast generation with Google Imagen 3",
+  },
+  {
     id: "nano-banana-2",
     label: "Google Nano Banana 2",
     value: "google/nano-banana-2",

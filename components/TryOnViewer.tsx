@@ -221,11 +221,10 @@ export function TryOnViewer({
         {/* Prompt & Advanced Settings */}
         {showAdvancedSettings && (
           <div className="flex flex-col gap-3 pt-2 border-t border-slate-200">
-            {selectedModel === "google/nano-banana-2" && (
               <div>
                 <label className="text-xs font-bold text-slate-800 flex items-center gap-1.5 mb-1.5">
                   <MessageSquareText className="w-3.5 h-3.5 text-amber-600" />
-                  <span>Prompt Instruction (Gemini Multimodal)</span>
+                  <span>Prompt Instruction</span>
                 </label>
                 <textarea
                   value={prompt}
@@ -235,7 +234,6 @@ export function TryOnViewer({
                   className="w-full text-xs bg-white border border-slate-300 rounded-lg p-2.5 font-medium text-slate-800 focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 transition-all resize-none"
                 />
               </div>
-            )}
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div>
