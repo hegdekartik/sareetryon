@@ -16,8 +16,8 @@ export default function Home() {
   const [personAspectRatio, setPersonAspectRatio] = useState<string | null>(null);
   const [sareeImage, setSareeImage] = useState<string | null>(null);
 
-  // Model & Generation parameters (cuuupid/idm-vton is default for lowest cost)
-  const [selectedModel, setSelectedModel] = useState<string>("cuuupid/idm-vton");
+  // Model & Generation parameters (black-forest-labs/flux-schnell is default for lowest cost)
+  const [selectedModel, setSelectedModel] = useState<string>("black-forest-labs/flux-schnell");
   const [prompt, setPrompt] = useState<string>(DEFAULT_PROMPT);
   const [aspectRatio, setAspectRatio] = useState<string>("match_input_image");
   const [resolution, setResolution] = useState<string>("1K");
@@ -119,7 +119,7 @@ export default function Home() {
   const providerDisplayName =
     selectedModel === "google/nano-banana-2"
       ? "Google Nano Banana 2"
-      : "IDM-VTON (~$0.003 / img)";
+      : "FLUX SCHNELL (~$0.003 / img)";
 
   return (
     <div className="min-h-dvh flex flex-col bg-slate-50/50 text-slate-900 selection:bg-amber-400 selection:text-slate-900">
@@ -225,7 +225,7 @@ export default function Home() {
       {/* Footer */}
       <footer className="w-full bg-white border-t border-slate-200 py-4 px-6 text-center text-xs text-slate-500 mt-auto">
         <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-2 font-medium">
-          <p>© {new Date().getFullYear()} SareeStudio AI — Powered by IDM-VTON & Replicate</p>
+          <p>© {new Date().getFullYear()} SareeStudio AI — Powered by FLUX SCHNELL & Replicate</p>
           <div className="flex items-center gap-4">
             <button
               onClick={() => setIsApiGuideOpen(true)}

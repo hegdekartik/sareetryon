@@ -50,7 +50,7 @@ export function TryOnViewer({
   onResolutionChange,
   isLoading,
   onGenerateTryOn,
-  providerName = "IDM-VTON",
+  providerName = "FLUX SCHNELL",
   error,
 }: TryOnViewerProps) {
   const [sliderPosition, setSliderPosition] = useState<number>(50);

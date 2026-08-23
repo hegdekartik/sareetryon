@@ -11,11 +11,11 @@ export interface ModelOption {
 
 export const MODEL_OPTIONS: ModelOption[] = [
   {
-    id: "idm-vton",
-    label: "IDM-VTON (Dedicated Saree Model)",
-    value: "cuuupid/idm-vton",
+    id: "flux-schnell",
+    label: "FLUX SCHNELL",
+    value: "black-forest-labs/flux-schnell",
     costLabel: "~$0.003 / image (Lowest Cost)",
-    description: "Dedicated virtual try-on model for preserving saree texture, pallu, and border weaves",
+    description: "Fast high-quality text-to-image model",
   },
   {
     id: "nano-banana-2",

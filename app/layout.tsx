@@ -5,7 +5,7 @@ export const metadata: Metadata = {
   title: "SareeStudio — Virtual Saree Try-On AI",
   description:
     "Mobile-friendly, clean, and minimal Virtual Saree Try-On web application powered by AI. Try authentic sarees onto reference person images with high identity preservation.",
-  keywords: ["virtual try-on", "saree try on", "AI saree", "IDM-VTON", "fashion AI", "ethnic wear"],
+  keywords: ["virtual try-on", "saree try on", "AI saree", "FLUX SCHNELL", "fashion AI", "ethnic wear"],
   authors: [{ name: "SareeStudio AI" }],
   openGraph: {
     title: "SareeStudio — Virtual Saree Try-On AI",

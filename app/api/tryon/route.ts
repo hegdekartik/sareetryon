@@ -9,7 +9,7 @@ export async function POST(req: NextRequest) {
       personImage,
       sareeImage,
       prompt,
-      model = "cuuupid/idm-vton",
+      model = "black-forest-labs/flux-schnell",
       aspect_ratio = "match_input_image",
       personAspectRatio,
       resolution = "2K",
@@ -45,7 +45,7 @@ export async function POST(req: NextRequest) {
     const inputPrompt = (prompt && prompt.trim()) ? prompt.trim() : DEFAULT_PROMPT;
 
     let output: any;
-    let providerName = "IDM-VTON (cuuupid/idm-vton)";
+    let providerName = "FLUX SCHNELL (black-forest-labs/flux-schnell)";
 
     if (model === "google/nano-banana-2") {
       providerName = "Google Nano Banana 2 (Replicate)";
@@ -63,17 +63,14 @@ export async function POST(req: NextRequest) {
 
       output = await replicate.run("google/nano-banana-2", { input });
     } else {
-      // Default: cuuupid/idm-vton (Dedicated VTON - ~$0.003/img)
-      providerName = "IDM-VTON (cuuupid/idm-vton)";
+      // Default: black-forest-labs/flux-schnell
+      providerName = "FLUX SCHNELL (black-forest-labs/flux-schnell)";
       const input: Record<string, any> = {
-        human_img: personImage,
-        garm_img: sareeImage,
-        garment_des: "Authentic traditional Indian saree attire with color-matched blouse, detailed zari border, waist pleats, and pallu design",
-        category: "dresses",
+        prompt: inputPrompt,
       };
 
       output = await replicate.run(
-        "cuuupid/idm-vton:c871d2e9bc709f538b7d413346d0a794b15ff3fa5f8c85775f0a0d9e830d9703",
+        "black-forest-labs/flux-schnell",
         { input }
       );
     }
