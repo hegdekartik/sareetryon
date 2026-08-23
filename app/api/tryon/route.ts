@@ -64,17 +64,51 @@ export async function POST(req: NextRequest) {
       output = await replicate.run("google/nano-banana-2", { input });
     } else if (model === "google/imagen-3-fast") {
       providerName = "Google Imagen 3 Fast (google/imagen-3-fast)";
+      
+      let targetAspectRatio = aspect_ratio;
+      if (aspect_ratio === "match_input_image" && personAspectRatio) {
+        targetAspectRatio = personAspectRatio;
+      } else if (aspect_ratio === "match_input_image") {
+        targetAspectRatio = "3:4";
+      }
+
+      const validImagenRatios = ["1:1", "9:16", "16:9", "3:4", "4:3"];
+      if (!validImagenRatios.includes(targetAspectRatio)) {
+        if (targetAspectRatio === "4:5" || targetAspectRatio === "2:3") {
+          targetAspectRatio = "3:4";
+        } else if (targetAspectRatio === "3:2") {
+          targetAspectRatio = "4:3";
+        } else {
+          targetAspectRatio = "3:4";
+        }
+      }
+
       const input: Record<string, any> = {
         prompt: inputPrompt,
-        aspect_ratio: aspect_ratio || "3:4",
+        aspect_ratio: targetAspectRatio || "3:4",
       };
 
       output = await replicate.run("google/imagen-3-fast", { input });
     } else {
       // Default: black-forest-labs/flux-schnell
       providerName = "FLUX SCHNELL (black-forest-labs/flux-schnell)";
+      
+      let targetAspectRatio = aspect_ratio;
+      if (aspect_ratio === "match_input_image" && personAspectRatio) {
+        targetAspectRatio = personAspectRatio;
+      } else if (aspect_ratio === "match_input_image") {
+        targetAspectRatio = "3:4";
+      }
+
+      const validFluxRatios = ["1:1", "16:9", "21:9", "3:2", "2:3", "4:5", "5:4", "3:4", "4:3", "9:16", "9:21"];
+      if (!validFluxRatios.includes(targetAspectRatio)) {
+        targetAspectRatio = "3:4";
+      }
+
       const input: Record<string, any> = {
         prompt: inputPrompt,
+        aspect_ratio: targetAspectRatio || "3:4",
+        output_format: "webp"
       };
 
       output = await replicate.run(
@@ -113,8 +147,13 @@ export async function POST(req: NextRequest) {
       resultUrl = typeof singleUrl === "object" ? singleUrl.href : String(singleUrl);
     }
 
-    if (!resultUrl) {
-      throw new Error(`No image output returned from ${providerName}.`);
+    if (resultUrl && resultUrl.startsWith("[object")) {
+      resultUrl = null;
+    }
+
+    if (!resultUrl || !(resultUrl.startsWith("http") || resultUrl.startsWith("data:"))) {
+      console.error("Invalid output from Replicate:", output);
+      throw new Error(`Invalid or missing image output returned from ${providerName}.`);
     }
 
     return NextResponse.json({
